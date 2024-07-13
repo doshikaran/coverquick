@@ -9,6 +9,53 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+// user
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  resumes Resume[]
+  jobDescriptions JobDescription[] 
+  coverLetters    CoverLetter[]    
+}
+
+// resume
+model Resume {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  filename  String
+  url       String   @db.VarChar(2048) 
+  content   String   @db.LongText
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+
+
+// job description
+model JobDescription {
+  id           Int      @id @default(autoincrement())
+  userId       String
+  description  String   @db.Text
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+// cover letter
+model CoverLetter {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
